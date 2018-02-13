@@ -1,3 +1,9 @@
+Примеры вызова:
+
+    https://api.camp-centr.ru/camps/list
+    https://api.camp-centr.ru/orders/list
+
+
 Yii 2 Basic Project Template
 ============================
 

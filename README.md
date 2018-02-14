@@ -1,7 +1,6 @@
 Примеры вызова:
 
-    https://api.camp-centr.ru/camps/list
-    https://api.camp-centr.ru/orders/list
+    [camps/list](https://api.camp-centr.ru/camps/list?hash=VM1XJeuUSMTm5hFUQUZGXs3RKOW)
 
 
 Yii 2 Basic Project Template

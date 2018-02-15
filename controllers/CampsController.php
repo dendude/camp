@@ -1,8 +1,9 @@
 <?php
+
 namespace app\controllers;
 
-use Yii;
 use app\models\Camps;
+use Yii;
 use yii\filters\AccessControl;
 use yii\filters\auth\QueryParamAuth;
 use yii\rest\Controller;
@@ -28,16 +29,17 @@ class CampsController extends Controller
         return $behaviors;
     }
     
-    public function actionList() {
+    public function actionList()
+    {
         /** @var $models Camps[] */
         $models = Camps::find()
-                ->byPartner(Yii::$app->user->id)
-                ->using()
-                ->orderBy(['id' => SORT_ASC])
-                ->all();
-            
+                       ->byPartner(Yii::$app->user->id)
+                       ->using()
+                       ->orderBy(['id' => SORT_ASC])
+                       ->all();
+        
         if (!$models) return [];
-    
+        
         $result = [];
         foreach ($models AS $model) {
             $result[$model->id] = $this->actionShow($model->id, $model);
@@ -46,34 +48,38 @@ class CampsController extends Controller
         return $result;
     }
     
-    public function actionShow($id, $model = null) {
+    public function actionShow($id, $model = null)
+    {
         /** @var $model Camps */
         if (!$model) {
             $model = Camps::find()->byPartner(Yii::$app->user->id)->using()->andWhere(['id' => $id])->one();
         }
-    
+        
         if (!$model) return [];
         
         return [
-            'id' => $model->id,
-            'url' => $model->getCampUrl(),
-            'name' => $model->about->name_short,
-            'name_org' => $model->about->name_org,
+            'id'        => $model->id,
+            'url'       => $model->getCampUrl(),
+            'name'      => $model->about->name_short,
+            'name_org'  => $model->about->name_org,
             'name_full' => $model->about->name_full,
-            'created' => $model->created,
-            'modified' => $model->modified,
+            'created'   => $model->created,
+            'modified'  => $model->modified,
         ];
     }
     
-    public function actionCreate($id) {
+    public function actionCreate($id)
+    {
     
     }
     
-    public function actionModify($id) {
+    public function actionModify($id)
+    {
     
     }
     
-    public function actionDelete($id) {
+    public function actionDelete($id)
+    {
     
     }
 }

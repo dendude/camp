@@ -12,6 +12,8 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /**
+ * Таблица со сменами для детских лагерей
+ *
  * This is the model class for table "{{%base_items}}".
  *
  * @property integer $id
@@ -54,10 +56,10 @@ class BaseItems extends ActiveRecord
     const SCENARIO_ADMIN = 'admin';
     
     const TYPE_PARTNER = 'partner';
+
+    const COMISSION_PERCENT = 'percent';
+    const COMISSION_VALUE = 'value';
     
-    /**
-     * @inheritdoc
-     */
     public static function tableName()
     {
         return '{{%base_items}}';
@@ -78,10 +80,6 @@ class BaseItems extends ActiveRecord
         return $scenarios;
     }
     
-    
-    /**
-     * @inheritdoc
-     */
     public function rules()
     {
         return [
@@ -127,7 +125,18 @@ class BaseItems extends ActiveRecord
     }
     
     /**
+     * получение лагеря смены
+     *
+     * @return mixed
+     */
+    public function getCamp()
+    {
+        return $this->hasOne(Camps::className(), ['id' => 'camp_id']);
+    }
+    
+    /**
      * проверка комиссии
+     *
      * @param $attribute
      * @param $params
      */
@@ -136,7 +145,7 @@ class BaseItems extends ActiveRecord
         if ($this->hasErrors()) return;
         
         if ($this->comission_value > $this->compare_comission) {
-            if ($this->comission_type == CampsContract::COMISSION_PERCENT) {
+            if ($this->comission_type == self::COMISSION_PERCENT) {
                 $this->addError($attribute, 'Введите не более 100%');
             } else {
                 $this->addError($attribute, "Введите не более {$this->compare_comission} {$this->currency}");
@@ -154,7 +163,7 @@ class BaseItems extends ActiveRecord
         if ($this->hasErrors()) return;
     
         if ($this->discount_value > $this->compare_discount) {
-            if ($this->discount_type == CampsContract::COMISSION_PERCENT) {
+            if ($this->discount_type == self::COMISSION_PERCENT) {
                 $this->addError($attribute, 'Введите не более 100%');
             } else {
                 $this->addError($attribute, "Введите не более {$this->compare_discount} {$this->currency}");
@@ -162,72 +171,19 @@ class BaseItems extends ActiveRecord
         }
     }
     
-    public function getCamp() {
-        return $this->hasOne(Camps::className(), ['id' => 'camp_id']);
-    }
-    
-    public static function getFilterListOrder($camp_id, $full = false) {
-        $query = self::find()->byCamp($camp_id)->ordering();
-        if ($full === false) $query->active();
-        $list = $query->all();
-        
-        return $list ? ArrayHelper::map($list, 'id', function(self $model){
-            // выводим запись: [01.01 - 09.01] 1 смена [10 мест]
-            return '[' . date('d.m', strtotime($model->date_from)) . ' - ' . date('d.m', strtotime($model->date_to)) . '] '
-                       . $model->name_short . ' [' . Normalize::wordAmount($model->partner_amount, ['мест','место','места'], true) . ']';
-        }) : [];
-    }
-    
-    public function getCurrentPrice($use_currency = false, $use_group = false, $type_price = null) {
-        $bank = new BankCourse();
-        
-        $result = $this->partner_price;
-    
-        if ($this->discount_value) {
-            // цена с учетом скидки
-            
-            if ($this->discount_type == CampsContract::COMISSION_PERCENT) {
-                if ($this->comission_type == CampsContract::COMISSION_PERCENT) {
-                    // сумма комиссии от процента
-                    $comission_sum = round($this->partner_price * $this->comission_value / 100);
-                } else {
-                    // сумма комиссии как значение
-                    $comission_sum = $this->comission_value;
-                }
-        
-                // скидка как процент от суммы комиссии
-                $result -= round($comission_sum * $this->discount_value / 100);
-            } else {
-                // скидка как значение
-                $result -= $this->discount_value;
-            }
-        }
-        
-        $result = $bank->convertToRubs($this->currency, $result);
-        
-        if ($this->camp->contract->opt_group_use && $use_group) {
-            // есть групповая скидка
-            $result *= (1 - $this->camp->contract->opt_group_discount / 100);
-        }
-    
-        $result = (ceil($result / 100) * 100); // округляем вверх до 100 рублей
-        if ($use_currency) $result.= (' ' . Html::tag('i', 'p', ['class' => 'als-rub']));
-        
-        return $result;
-    }
-    
+    /**
+     * преобразование данных перед валидацией
+     *
+     * @return mixed
+     */
     public function beforeValidate()
     {
         if ($this->isNewRecord) {
-            $this->created = time();
-            
-            if ($this->scenario == self::SCENARIO_PARTNER) $this->status = Statuses::STATUS_ACTIVE;
             if (Users::isPartner()) $this->partner_id = Yii::$app->user->id;
-        } else {
-            $this->modified = time();
         }
         
         if (Users::isAdmin()) $this->manager_id = Yii::$app->user->id;
+        
         if ($this->date_from_orig) $this->date_from = Normalize::getSqlDate($this->date_from_orig);
         if ($this->date_to_orig) $this->date_to = Normalize::getSqlDate($this->date_to_orig);
 
@@ -235,42 +191,11 @@ class BaseItems extends ActiveRecord
         
         return parent::beforeValidate();
     }
-
-    public function getCurrentCurrency()
-    {
-        if ($this->isNewRecord) return Orders::CUR_RUB;
-        return $this->currency;
-    }
-    
-    public static function getDaysPerItem()
-    {
-        $arr = [];
-        for ($i = 1; $i <= 30; $i++) {
-            $arr[$i] = Normalize::wordAmount($i, ['дней','день','дня'], true);
-        }
-        
-        return $arr;
-    }
-    
-    public function afterFind()
-    {
-        $this->date_from_orig = Normalize::getDate($this->date_from);
-        $this->date_to_orig = Normalize::getDate($this->date_to);
-        
-        parent::afterFind();
-    }
-    
-    public function getAttributes($names = null, $except = [])
-    {
-        $attributes = parent::getAttributes($names, $except);
-        $attributes['date_from_orig'] = $this->date_from_orig;
-        $attributes['date_to_orig'] = $this->date_to_orig;
-        
-        return $attributes;
-    }
     
     /**
-     * @inheritdoc
+     * используем слияние массивов для часто-используемых лейблов
+     *
+     * @return array
      */
     public function attributeLabels()
     {

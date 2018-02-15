@@ -68,16 +68,28 @@ class CampsController extends Controller
         ];
     }
     
+    /**
+     * @todo доработка API
+     * @param $id
+     */
     public function actionCreate($id)
     {
     
     }
     
+    /**
+     * @todo доработка API
+     * @param $id
+     */
     public function actionModify($id)
     {
     
     }
     
+    /**
+     * @todo доработка API
+     * @param $id
+     */
     public function actionDelete($id)
     {
     

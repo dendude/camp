@@ -37,13 +37,6 @@ class CampHelper
         return Url::to(['/site/camps', 'type' => self::TYPE_CITY, 'alias' => $model->about->city->alias]);
     }
     
-    public static function getTypeCampsUrl($id)
-    {
-        $tag = TagsTypes::findOne($id);
-        
-        return Url::to(['/site/camps', 'type' => self::TYPE_TYPE, 'alias' => $tag->alias]);
-    }
-    
     public static function getTypeCompensationUrl()
     {
         return Url::to(['/site/camps', 'type' => self::TYPE_COMPENSATION, 'alias' => 'yes']);
@@ -52,21 +45,5 @@ class CampHelper
     public static function getTypeGroupsUrl()
     {
         return Url::to(['/site/camps', 'type' => self::TYPE_GROUPS, 'alias' => 'yes']);
-    }
-    
-    public static function getServiceCampsUrl($id)
-    {
-        $tag = ComfortTypes::findOne($id);
-        
-        return Url::to(['/site/camps', 'type' => self::TYPE_SERVICE, 'alias' => $tag->alias]);
-    }
-    
-    public static function getAgesCampsUrl(Camps $model)
-    {
-        return Url::to([
-           '/site/camps',
-           'type'  => self::TYPE_YEARS,
-           'alias' => $model->about->age_from . '-' . $model->about->age_to,
-       ]);
     }
 }

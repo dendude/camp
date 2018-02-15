@@ -1,5 +1,4 @@
 <?php
-
 namespace app\controllers;
 
 use app\models\BaseItems;
@@ -30,15 +29,13 @@ class CampItemsController extends Controller
         return $behaviors;
     }
     
-    
     public function actionList()
     {
         /** @var $models BaseItems[] */
-        $models = BaseItems::find()
-                           ->byPartner(Yii::$app->user->id)
-                           ->using()
-                           ->orderBy('camp_id ASC, date_from ASC, date_to ASC')
-                           ->all();
+        $models = BaseItems::find()->byPartner(Yii::$app->user->id)
+                                   ->using()
+                                   ->orderBy('camp_id ASC, date_from ASC, date_to ASC')
+                                   ->all();
         
         if (!$models) return [];
         
@@ -53,11 +50,11 @@ class CampItemsController extends Controller
     public function actionCamp($id)
     {
         /** @var $models BaseItems[] */
-        $models = BaseItems::find()
-                           ->byPartner(Yii::$app->user->id)
-                           ->byCamp($id)
-                           ->using()
-                           ->orderBy('camp_id ASC, date_from ASC, date_to ASC')->all();
+        $models = BaseItems::find()->byPartner(Yii::$app->user->id)
+                                   ->byCamp($id)
+                                   ->using()
+                                   ->orderBy('camp_id ASC, date_from ASC, date_to ASC')
+                                   ->all();
         
         if (!$models) return [];
         
@@ -102,16 +99,28 @@ class CampItemsController extends Controller
         ];
     }
     
+    /**
+     * @todo доработка API
+     * @param $id
+     */
     public function actionCreate($id)
     {
     
     }
     
+    /**
+     * @todo доработка API
+     * @param $id
+     */
     public function actionModify($id)
     {
     
     }
     
+    /**
+     * @todo доработка API
+     * @param $id
+     */
     public function actionDelete($id)
     {
     

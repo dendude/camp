@@ -6,17 +6,17 @@ use yii\helpers\Html;
 
 class Normalize
 {
-	public static function getDate($date)
+    public static function getDate($date)
     {
-	    $t = strtotime($date);
-	    if (empty($t)) return '';
+	$t = strtotime($date);
+	if (empty($t)) return '';
 	    
-		return date('d.m.Y', $t);
-	}
+        return date('d.m.Y', $t);
+    }
     
     public static function getSqlDate($date)
     {
-	    if (empty($date)) return '';
+	if (empty($date)) return '';
 
         return date('Y-m-d', strtotime($date));
     }
@@ -49,28 +49,28 @@ class Normalize
         return $return_arr;
     }
 
-	public static function getMonthName($date)
+    public static function getMonthName($date)
     {
-		$monthNumber = date('m', strtotime($date));
+	$monthNumber = date('m', strtotime($date));
 
-		switch($monthNumber) {
-			case '01': $m = 'янв'; break;
-			case '02': $m = 'фев'; break;
-			case '03': $m = 'мар'; break;
-			case '04': $m = 'апр'; break;
-			case '05': $m = 'май'; break;
-			case '06': $m = 'июн'; break;
-			case '07': $m = 'июл'; break;
-			case '08': $m = 'авг'; break;
-			case '09': $m = 'сен'; break;
-			case '10': $m = 'окт'; break;
-			case '11': $m = 'ноя'; break;
-			case '12': $m = 'дек'; break;
+	switch($monthNumber) {
+	    case '01': $m = 'янв'; break;
+	    case '02': $m = 'фев'; break;
+	    case '03': $m = 'мар'; break;
+	    case '04': $m = 'апр'; break;
+	    case '05': $m = 'май'; break;
+	    case '06': $m = 'июн'; break;
+	    case '07': $m = 'июл'; break;
+	    case '08': $m = 'авг'; break;
+	    case '09': $m = 'сен'; break;
+	    case '10': $m = 'окт'; break;
+	    case '11': $m = 'ноя'; break;
+	    case '12': $m = 'дек'; break;
             default: $m = '';
-		}
-
-		return $m;
 	}
+
+	return $m;
+    }
     
     public static function getFullDate($date, $sep = ' ', $seconds = false)
     {
